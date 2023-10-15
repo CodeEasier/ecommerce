@@ -85,10 +85,9 @@ exports.login = async (req, res) => {
         })
     }
 
-
     //athuntication
     try {
-        if (user.active === 1) {
+        if (user.active === 0) {
             return res.status(400).json({
                 "Message": "Account not Active Please Visit your Email"
             })
@@ -98,10 +97,17 @@ exports.login = async (req, res) => {
         //console.log(data)
         if (data) {
             //create Token
-            const token = jwt.sign({ _id: user._id }, process.env.SECRET);
+            const token = jwt.sign(
+                { _id: user._id },
+                process.env.SECRET,
+                {
+                    expiresIn: "2h",
+                }
+            );
             //put Token into COKKEE
             res.cookie('token', token, { expire: new date() + 1 })
             ///send response to front end
+            //user.token = token;
             res.json({
                 "Message": "Login",
                 token,
@@ -120,6 +126,109 @@ exports.login = async (req, res) => {
         })
     }
 
+}
+
+exports.forgetpassword = async (req, res) => {
+    const user = await User.findOne({ email: req.body.email })
+    if (!user) {
+        return res.status(400).json({
+            error: "email not exist"
+        })
+    }
+    if (user.active === 0) {
+        return res.status(400).json({
+            "Message": "Account not Active Please Visit your Email"
+        })
+    }
+
+    const verificationCode = Math.floor(Math.random() * (10000 - 1 + 4));
+    const from = "tiyaabali@gmail.com";
+    const to = "tiyaabali@gmail.com";
+    const subject = "subcject";
+    const text = "www.tiyaabali.com/forgetpassword/" + verificationCode;
+    fn.sendEmailFunction(from, to, subject, text)
+
+    const result = await User.findOneAndUpdate(
+        { email: req.body.email },
+        { forgetpasswordVerificationCode: verificationCode },
+        {
+            new: true
+        }
+    )
+
+    return res.status(200).json({
+        "Message": "Please Visit your Email"
+    })
+}
+
+exports.forgetpasswordVerificationCode = async (req, res) => {
+    // console.log(req.body.oldPassword)
+    // console.log(req.params.forgetpasswordVerificationCode)
+    const user = await User.findOne({ forgetpasswordVerificationCode: req.params.forgetpasswordVerificationCode })
+    if (user == '' || user == null) {
+        return res.status(400).json({
+            "Error Message": "Invilied URL and Code"
+        })
+    }
+    const hash = await argon2.hash(req.body.password);
+    const data = await argon2.verify(user.encry_password, req.body.oldPassword);
+    if (data) {
+        const result = await User.findOneAndUpdate(
+            { forgetpasswordVerificationCode: req.params.forgetpasswordVerificationCode },
+            {
+                forgetpasswordVerificationCode: "",
+                encry_password: hash
+            },
+            {
+                new: true
+            }
+        )
+        return res.status(200).json({
+            "Message": "password change successfully"
+        })
+    } else {
+        return res.status(400).json({
+            "Error": "Old Paasword is Incorrect"
+        })
+    }
+
+    return res.status(200).json({
+        "Message": "Go to and http://localhost:8080/api/setNewPasswordForget"
+    })
+}
+
+exports.changePassword = async (req, res) => {
+  const getUser = jwt.decode(req.headers.token, process.env.SECRET)
+  //console.log(user._id)
+  const user = await User.findOne({ _id: getUser._id})
+  if (user == '' || user == null) {
+      return res.status(400).json({
+          "Error Message": "Invilied Token"
+      })
+  }
+
+  const data = await argon2.verify(user.encry_password, req.body.oldPassword);
+  const hash = await argon2.hash(req.body.password);
+  if (data) {
+      const result = await User.findOneAndUpdate(
+          {  _id: getUser._id },
+          {
+              encry_password: hash
+          },
+          {
+              new: true
+          }
+      )
+      return res.status(200).json({
+          "Message": "password change successfully"
+      })
+  } else {
+      return res.status(400).json({
+          "Error": "Old Paasword is Incorrect"
+      })
+  }
+   
+  //res.status(200).send("Welcome 🙌 ");
 }
 
 exports.signout = (req, res) => {

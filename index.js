@@ -16,5 +16,13 @@ const userRoutes = require("./routes/user");
 conectDB();
 
 app.use("/api", userRoutes)
+/*const auth = require("./middleware/auth");
+
+app.post("/welcome", auth, (req, res) => {
+    const aa = req.headers.token;
+    console.log(aa)
+   
+  res.status(200).send("Welcome 🙌 ");
+});*/
 
 app.listen(process.env.PORT, console.log("Program is running on " + process.env.PORT))

@@ -39,6 +39,10 @@ const userSchema = mongoose.Schema({
     verificationCode:{
         type:String
     },
+
+    forgetpasswordVerificationCode:{
+        type:String
+    },
     salt:String
 },
 {timestamp:true}
