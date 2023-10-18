@@ -55,9 +55,7 @@ exports.deleteSmartPhone = async (req, res) => {
 
 exports.updateSmartPhone = async (req, res) => {
     const dataID = req.params.id;
-    //console.log(req.params.verificationCode)
     const data = await SmartPhone.findOne({ _id: dataID })
-    //console.log(user)
     if (data == '' || data == null) {
         return res.status(400).json({
             "Error Message": "Invilied URL "
@@ -72,6 +70,7 @@ exports.updateSmartPhone = async (req, res) => {
 }
 
 /////////////Extra Function About This Controller//////////
+
 const Storage = multer.diskStorage({
     destination: 'uploads',
     filename: (req, file, cb) => {
@@ -82,5 +81,3 @@ const Storage = multer.diskStorage({
 const upload = multer({
     storage: Storage
 }).single('image')
-
-

@@ -12,12 +12,14 @@ app.use(cors())
 
 const userRoutes = require("./routes/user");
 const smartPhoneRoutes = require("./routes/smartPhone")
+const cartRoutes = require("./routes/cart")
 
 
 conectDB();
 
 app.use("/api", userRoutes)
 app.use("/api", smartPhoneRoutes)
+app.use("/api", cartRoutes)
 /*const auth = require("./middleware/auth");
 
 app.post("/welcome", auth, (req, res) => {

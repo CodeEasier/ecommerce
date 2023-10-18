@@ -43,7 +43,11 @@ const userSchema = mongoose.Schema({
     forgetpasswordVerificationCode:{
         type:String
     },
-    salt:String
+    salt:String,
+    author :{
+        type: mongoose.Schema.Types.ObjectId,
+        ref : 'Cart',
+    }
 },
 {timestamp:true}
 )
