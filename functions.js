@@ -1,4 +1,5 @@
 const nodemailer = require("nodemailer");
+const multer = require("multer")
 
 function sendEmailFunction(from, to, subject, text) {
 
@@ -31,4 +32,8 @@ function sendEmailFunction(from, to, subject, text) {
         })
 }
 
-module.exports = { sendEmailFunction };
+function uploadImage(){
+    
+}
+
+module.exports = { sendEmailFunction, uploadImage };

@@ -11,11 +11,13 @@ app.use(cookieParser())
 app.use(cors())
 
 const userRoutes = require("./routes/user");
+const smartPhoneRoutes = require("./routes/smartPhone")
 
 
 conectDB();
 
 app.use("/api", userRoutes)
+app.use("/api", smartPhoneRoutes)
 /*const auth = require("./middleware/auth");
 
 app.post("/welcome", auth, (req, res) => {
